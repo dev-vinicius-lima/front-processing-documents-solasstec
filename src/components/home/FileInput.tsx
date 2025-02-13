@@ -2,16 +2,22 @@
 import { useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Paperclip } from "lucide-react"
+// import { toast } from "@/hooks/use-toast"
 
 interface FileInputProps {
   buttonText?: string
+  onFileChange: (file: File | null) => void
 }
 
-const FileInputComponent = ({ buttonText = "Anexo" }: FileInputProps) => {
+const FileInputComponent = ({
+  buttonText = "Anexo",
+  onFileChange,
+}: FileInputProps) => {
   const [selectedFile, setSelectedFile] = useState<string>("")
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
+    onFileChange(file || null)
     setSelectedFile(file ? file.name : "")
   }
 
@@ -28,6 +34,7 @@ const FileInputComponent = ({ buttonText = "Anexo" }: FileInputProps) => {
       <input
         ref={fileInputRef}
         type="file"
+        accept=".pdf"
         onChange={handleFileChange}
         onClick={(e) => e.stopPropagation()}
         className="hidden"
