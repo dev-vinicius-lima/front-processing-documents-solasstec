@@ -4,15 +4,18 @@ import { Edit, Paperclip, Search, Trash } from "lucide-react"
 import useDocuments from "@/hooks/useDocuments"
 import { IDocument } from "@/types/Document"
 import usePagination from "@/hooks/usePagination"
+import useSearch from "@/hooks/useSearch"
 
 const InputWithIcon = ({
   type,
   placeholder,
   className,
+  onChange,
 }: {
   type: string
   placeholder: string
   className: string
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
 }) => {
   return (
     <div className="flex items-center border border-slate-300 rounded-md shadow-sm">
@@ -21,6 +24,7 @@ const InputWithIcon = ({
         type={type}
         placeholder={placeholder}
         className={`w-full h-10 px-2 outline-none ${className}`}
+        onChange={onChange}
       />
     </div>
   )
@@ -28,23 +32,33 @@ const InputWithIcon = ({
 
 const TableWithInputs = () => {
   const { documents, loading, error } = useDocuments()
-  const { currentData, currentPage, totalPages, nextPage, prevPage } =
-    usePagination(documents, 5)
+  const { currentPage, totalPages, nextPage, prevPage } = usePagination(
+    documents,
+    5
+  )
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { searchTerms, updateSearchTerm, filteredData } = useSearch(documents)
 
-  const headers = [
-    "Nº Documento",
-    "Título",
-    "Setor Envio",
-    "Data Hora - Envio",
-    "Setor Recebimento",
-    "Data Hora - Recebimento",
-    "Anexo",
-    "Ações",
-  ]
+  const HEADER_TO_FIELD_MAP: Record<string, keyof typeof searchTerms> = {
+    "nº documento": "id",
+    título: "title",
+    "setor envio": "sectorShipping",
+    "data hora - envio": "dateTimeSubmission",
+    "setor recebimento": "ReceivingSector",
+    "data hora - recebimento": "dateTimeReceived",
+    Anexo: "Anexo",
+    Ações: "Ações",
+  }
+
+  const headers = Object.keys(HEADER_TO_FIELD_MAP)
 
   if (loading) return <div>Loading...</div>
   if (error) return <div>Error: {error}</div>
 
+  const currentDocuments = filteredData.slice(
+    (currentPage - 1) * 5,
+    currentPage * 5
+  )
   return (
     <>
       <table className="min-w-full w-full mt-6 mb-2 shadow-md border border-slate-200 rounded-lg overflow-hidden text-sm">
@@ -66,13 +80,24 @@ const TableWithInputs = () => {
                   type="text"
                   placeholder="Buscar..."
                   className="w-full h-10 px-2 outline-none"
+                  onChange={(e) =>
+                    updateSearchTerm(
+                      HEADER_TO_FIELD_MAP[header.toLowerCase()],
+                      e.target.value
+                    )
+                  }
                 />
               </td>
             ))}
           </tr>
         </thead>
         <tbody>
-          {currentData.map((item: IDocument) => (
+          {!currentDocuments.length && (
+            <td colSpan={10} className="text-center p-4">
+              Nenhum documento encontrado...
+            </td>
+          )}
+          {currentDocuments.map((item: IDocument) => (
             <tr key={item.id}>
               <td className="border border-slate-200 p-2">{item.id}</td>
               <td className="border border-slate-200 p-2">{item.title}</td>
@@ -117,7 +142,7 @@ const TableWithInputs = () => {
         </span>
         <button
           onClick={nextPage}
-          disabled={currentPage === totalPages}
+          disabled={currentPage === totalPages || !filteredData.length}
           className="bg-cyan-600 text-white px-4 py-2 rounded disabled:opacity-50"
         >
           Próxima
