@@ -1,8 +1,6 @@
 import React from "react"
-import { Button } from "../ui/button"
-
-import { Plus } from "lucide-react"
 import TableWithInputs from "./SearchInput"
+import ButtonRegisterDocuments from "./ButtonRegisterDocuments"
 
 const Main = () => {
   return (
@@ -12,10 +10,7 @@ const Main = () => {
         <div className="bg-slate-200 w-[60%] mt-4">
           <h2 className="text-lg p-3 text-cyan-600">Documentos</h2>
         </div>
-        <Button className="mt-4 bg-cyan-600 w-[15%] h-8 hover:bg-cyan-800">
-          <Plus size={48} strokeWidth={3} />
-          <p className="text-white font-bold">CADASTRAR</p>
-        </Button>
+        <ButtonRegisterDocuments />
         <TableWithInputs />
       </div>
     </div>
