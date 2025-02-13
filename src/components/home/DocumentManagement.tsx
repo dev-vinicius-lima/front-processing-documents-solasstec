@@ -6,7 +6,7 @@ import TableWithInputs from "./SearchInput"
 
 const Main = () => {
   return (
-    <div className="w-[95%] h-[95%] bg-white mx-auto rounded shadow-sm">
+    <div className="w-[98%] h-[95%] bg-white mx-auto rounded shadow-sm">
       <div className="flex flex-col px-3">
         <h1 className="text-xl mt-7 font-bold">GERENCIAMENTO DE DOCUMENTOS</h1>
         <div className="bg-slate-200 w-[60%] mt-4">

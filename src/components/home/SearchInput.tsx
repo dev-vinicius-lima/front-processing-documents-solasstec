@@ -1,6 +1,9 @@
-import React from "react"
+"use client"
 import { Input } from "../ui/input"
-import { Edit, Search, Trash } from "lucide-react"
+import { Edit, Paperclip, Search, Trash } from "lucide-react"
+import useDocuments from "@/hooks/useDocuments"
+import { IDocument } from "@/types/Document"
+import usePagination from "@/hooks/usePagination"
 
 const InputWithIcon = ({
   type,
@@ -24,6 +27,10 @@ const InputWithIcon = ({
 }
 
 const TableWithInputs = () => {
+  const { documents, loading, error } = useDocuments()
+  const { currentData, currentPage, totalPages, nextPage, prevPage } =
+    usePagination(documents, 5)
+
   const headers = [
     "Nº Documento",
     "Título",
@@ -35,79 +42,88 @@ const TableWithInputs = () => {
     "Ações",
   ]
 
-  const data = [
-    {
-      numero: "001",
-      titulo: "Documento 1",
-      setorEnvio: "Setor A",
-      dataHoraEnvio: "2023-10-01 10:00",
-      setorRecebimento: "Setor B",
-      dataHoraRecebimento: "2023-10-01 10:30",
-      anexo: "anexo1.pdf",
-      acoes: "Visualizar",
-    },
-    {
-      numero: "002",
-      titulo: "Documento 2",
-      setorEnvio: "Setor C",
-      dataHoraEnvio: "2023-10-02 11:00",
-      setorRecebimento: "Setor D",
-      dataHoraRecebimento: "2023-10-02 11:30",
-      anexo: "anexo2.pdf",
-      acoes: "Visualizar",
-    },
-  ]
+  if (loading) return <div>Loading...</div>
+  if (error) return <div>Error: {error}</div>
 
   return (
-    <table className="min-w-full w-full mt-6 mb-2 shadow-md border border-slate-200 rounded-lg overflow-hidden text-sm">
-      <thead className="bg-slate-100">
-        <tr>
-          {headers.map((header) => (
-            <th
-              key={header}
-              className="text-slate-600 border border-slate-200 p-3 text-left"
-            >
-              {header}
-            </th>
-          ))}
-        </tr>
-        <tr>
-          {headers.map((header) => (
-            <td className="border border-slate-200 p-2" key={header}>
-              <InputWithIcon
-                type="text"
-                placeholder="Buscar..."
-                className="w-full h-10 px-2 outline-none"
-              />
-            </td>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {data.map((item) => (
-          <tr key={item.numero}>
-            <td className="border border-slate-200 p-2">{item.numero}</td>
-            <td className="border border-slate-200 p-2">{item.titulo}</td>
-            <td className="border border-slate-200 p-2">{item.setorEnvio}</td>
-            <td className="border border-slate-200 p-2">
-              {item.dataHoraEnvio}
-            </td>
-            <td className="border border-slate-200 p-2">
-              {item.setorRecebimento}
-            </td>
-            <td className="border border-slate-200 p-2">
-              {item.dataHoraRecebimento}
-            </td>
-            <td className="border border-slate-200 p-2">{item.anexo}</td>
-
-            <td className="flex items-center justify-center gap-4 border border-slate-200 p-2">
-              <Edit className="cursor-pointer text-blue-500" />
-              <Trash className="cursor-pointer text-red-500" />
-            </td>
+    <>
+      <table className="min-w-full w-full mt-6 mb-2 shadow-md border border-slate-200 rounded-lg overflow-hidden text-sm">
+        <thead className="bg-slate-100">
+          <tr>
+            {headers.map((header) => (
+              <th
+                key={header}
+                className="text-slate-600 border border-slate-200 p-3 text-left"
+              >
+                {header}
+              </th>
+            ))}
           </tr>
-        ))}
-      </tbody>
-    </table>
+          <tr>
+            {headers.map((header) => (
+              <td className="border border-slate-200 p-2" key={header}>
+                <InputWithIcon
+                  type="text"
+                  placeholder="Buscar..."
+                  className="w-full h-10 px-2 outline-none"
+                />
+              </td>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {currentData.map((item: IDocument) => (
+            <tr key={item.id}>
+              <td className="border border-slate-200 p-2">{item.id}</td>
+              <td className="border border-slate-200 p-2">{item.title}</td>
+              <td className="border border-slate-200 p-2">
+                {item.sectorShipping}
+              </td>
+              <td className="border border-slate-200 p-2">
+                {item.dateTimeSubmission}
+              </td>
+              <td className="border border-slate-200 p-2">
+                {item.ReceivingSector}
+              </td>
+              <td className="border border-slate-200 p-2">
+                {item.dateTimeReceived}
+              </td>
+              <td className="border border-slate-200 p-2">
+                <Paperclip
+                  size={30}
+                  strokeWidth={1}
+                  className="cursor-pointer mx-auto"
+                />
+              </td>
+
+              <td className="flex items-center justify-center gap-4 border border-slate-200 p-2">
+                <Edit className="cursor-pointer text-blue-500" />
+                <Trash className="cursor-pointer text-red-500" />
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <div className="flex justify-between mt-4">
+        <button
+          onClick={prevPage}
+          disabled={currentPage === 1}
+          className="bg-cyan-600 text-white px-4 py-2 rounded disabled:opacity-50"
+        >
+          Anterior
+        </button>
+        <span>
+          Página {currentPage} de {totalPages}
+        </span>
+        <button
+          onClick={nextPage}
+          disabled={currentPage === totalPages}
+          className="bg-cyan-600 text-white px-4 py-2 rounded disabled:opacity-50"
+        >
+          Próxima
+        </button>
+      </div>
+    </>
   )
 }
 
