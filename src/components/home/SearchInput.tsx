@@ -5,6 +5,8 @@ import useDocuments from "@/hooks/useDocuments"
 import { IDocument } from "@/types/Document"
 import usePagination from "@/hooks/usePagination"
 import useSearch from "@/hooks/useSearch"
+import { useDocumentDeletion } from "@/hooks/useDocumentDeletion"
+import { toast } from "@/hooks/use-toast"
 
 const InputWithIcon = ({
   type,
@@ -31,11 +33,36 @@ const InputWithIcon = ({
 }
 
 const TableWithInputs = () => {
-  const { documents, loading, error } = useDocuments()
+  const { documents, loading, error, setDocuments } = useDocuments()
   const { currentPage, totalPages, nextPage, prevPage } = usePagination(
     documents,
     5
   )
+  const { deleteDocument } = useDocumentDeletion()
+  const { refetch } = useDocuments()
+
+  const handleDelete = async (documentId: number) => {
+    try {
+      await deleteDocument(String(documentId))
+      setDocuments((prevDocuments) =>
+        prevDocuments.filter((doc) => doc.id !== documentId)
+      )
+
+      await refetch()
+
+      if (filteredData.length === 1 && currentPage > 1) {
+        prevPage()
+      }
+
+      toast({
+        title: "Documento deletado com sucesso",
+        description: "O documento foi deletado com sucesso.",
+        className: "bg-green-500 text-white",
+      })
+    } catch (err) {
+      console.error("Erro ao deletar:", err)
+    }
+  }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { searchTerms, updateSearchTerm, filteredData } = useSearch(documents)
 
@@ -51,14 +78,14 @@ const TableWithInputs = () => {
   }
 
   const headers = Object.keys(HEADER_TO_FIELD_MAP)
-
-  if (loading) return <div>Loading...</div>
-  if (error) return <div>Error: {error}</div>
-
   const currentDocuments = filteredData.slice(
     (currentPage - 1) * 5,
     currentPage * 5
   )
+
+  if (loading) return <div>Loading...</div>
+  if (error) return <div>Error: {error}</div>
+
   return (
     <>
       <table className="min-w-full w-full mt-6 mb-2 shadow-md border border-slate-200 rounded-lg overflow-hidden text-sm">
@@ -123,7 +150,10 @@ const TableWithInputs = () => {
 
               <td className="flex items-center justify-center gap-4 border border-slate-200 p-2">
                 <Edit className="cursor-pointer text-blue-500" />
-                <Trash className="cursor-pointer text-red-500" />
+                <Trash
+                  className="cursor-pointer text-red-500"
+                  onClick={() => handleDelete?.(item.id)}
+                />
               </td>
             </tr>
           ))}

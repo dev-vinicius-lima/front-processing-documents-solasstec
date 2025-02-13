@@ -32,6 +32,7 @@ const useDocuments = () => {
   return {
     documents,
     loading,
+    setDocuments,
     error,
     refetch: fetchDocuments,
   }
