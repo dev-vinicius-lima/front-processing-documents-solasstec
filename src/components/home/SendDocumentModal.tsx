@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select"
+import useDepartments from "@/hooks/useDepartments"
 
 interface SendDocumentModalProps {
   isOpen: boolean
@@ -26,20 +27,24 @@ const SendDocumentModal = ({
   const [sectorShipping, setSectorShipping] = useState(
     document.sectorShipping || ""
   )
+  const { departments } = useDepartments()
   const [receivingSector, setReceivingSector] = useState("")
-  const [description, setDescription] = useState("")
+  const [description, setDescription] = useState(document.description)
   const [attachment, setAttachment] = useState<File | null>(null)
 
   useEffect(() => {
     setSectorShipping(document.sectorShipping || "")
-  }, [document.sectorShipping])
+    if (document.file) {
+      setAttachment(null)
+    }
+  }, [document.file, document.sectorShipping])
 
   const handleSubmit = () => {
     console.log("Documento enviado:", {
       sectorShipping,
       receivingSector,
       description,
-      attachment,
+      attachment: attachment || document.file,
     })
 
     onClose()
@@ -58,7 +63,7 @@ const SendDocumentModal = ({
       <div className="p-6 w-[65%] h-[85%] bg-white rounded-lg shadow-md flex flex-col justify-center items-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50]">
         <div className="flex flex-col w-full h-full gap-4">
           <div className="flex justify-between w-full">
-            <h2 className="text-2xl font-bold">Tramiação de documento</h2>
+            <h2 className="text-2xl font-bold">Tramitação de documento</h2>
             <button
               className="text-gray-500 hover:text-gray-700"
               onClick={onClose}
@@ -84,11 +89,16 @@ const SendDocumentModal = ({
               </label>
               <Select onValueChange={(value) => setReceivingSector(value)}>
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder={receivingSector} />
+                  <SelectValue placeholder={"Selecione um setor"} />
                   <SelectContent>
-                    <SelectItem value="setor1">Setor 1</SelectItem>
-                    <SelectItem value="setor2">Setor 2</SelectItem>
-                    <SelectItem value="setor3">Setor 3</SelectItem>
+                    {departments.map((department) => (
+                      <SelectItem
+                        key={department.id}
+                        value={department.acronym}
+                      >
+                        {department.acronym}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </SelectTrigger>
               </Select>
@@ -166,11 +176,7 @@ const SendDocumentModal = ({
               <Paperclip className="mr-2" />
               <Input
                 type="file"
-                onChange={(e) => {
-                  if (e.target.files && e.target.files.length > 0) {
-                    setAttachment(e.target.files[0])
-                  }
-                }}
+                onChange={(e) => setAttachment(e.target.files?.[0] || null)}
                 className="w-full"
               />
             </div>
