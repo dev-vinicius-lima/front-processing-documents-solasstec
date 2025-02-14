@@ -199,23 +199,32 @@ const TableWithInputs = () => {
 
               <td className="flex items-center justify-center gap-4 border border-slate-200 p-2">
                 <FileDown
-                  className={`cursor-pointer text-green-600 hover:text-green-800 ${
-                    item.isReceived ||
-                    item.sectorShipping === item.ReceivingSector
-                      ? "opacity-50 cursor-auto disabled"
-                      : ""
-                  }`}
-                  onClick={() =>
-                    !item.isReceived &&
-                    item.sectorShipping !== item.ReceivingSector
-                      ? handleReceiveClick(item)
-                      : null
+                  className={
+                    "cursor-pointer text-green-600 :hover:text-green-800"
                   }
+                  onClick={() => {
+                    if (
+                      !item.isReceived &&
+                      item.sectorShipping !== item.ReceivingSector
+                    ) {
+                      handleReceiveClick(item)
+                    }
+                  }}
+                  style={{
+                    opacity: item.isReceived || !item.sectorShipping ? 0.5 : 1,
+                    cursor:
+                      item.isReceived || !item.sectorShipping
+                        ? "not-allowed"
+                        : "pointer",
+                  }}
                 />
                 <FileUp
                   className="cursor-pointer text-cyan-600 :hover:text-cyan-800"
                   onClick={() => !item.isSend && handleSendClick(item)}
-                  style={{ opacity: item.isSend ? 0.5 : 1, cursor: "auto" }}
+                  style={{
+                    opacity: item.isSend ? 0.5 : 1,
+                    cursor: item.isSend ? "not-allowed" : "pointer",
+                  }}
                 />
                 <Edit className="cursor-pointer text-blue-500" />
                 <Trash

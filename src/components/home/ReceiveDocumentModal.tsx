@@ -30,7 +30,7 @@ const ReceiveDocumentModal = ({
   setDocuments,
 }: SendDocumentModalProps) => {
   const [sectorShipping, setSectorShipping] = useState(
-    documentCreate.sectorShipping || ""
+    documentCreate.departmentId || ""
   )
   const { receiveDocument, loading } = useReceiveDocument()
   const { departments } = useDepartments()
@@ -39,15 +39,14 @@ const ReceiveDocumentModal = ({
   const [description, setDescription] = useState(documentCreate.description)
   const [attachment, setAttachment] = useState<File | null>(null)
 
-  console.log("document:", documentCreate)
-
   useEffect(() => {
-    setSectorShipping(documentCreate.sectorShipping || "")
+    setSectorShipping(String(documentCreate.departmentId) || "")
     if (documentCreate.file) {
       setAttachment(null)
       setDescription(documentCreate.description)
     }
   }, [
+    documentCreate.departmentId,
     documentCreate.description,
     documentCreate.file,
     documentCreate.sectorShipping,
@@ -63,11 +62,14 @@ const ReceiveDocumentModal = ({
       return
     }
 
+    console.log("Payload enviado:", {
+      sectorShipping,
+      receivingSector,
+    })
     if (sectorShipping === receivingSector) {
       toast({
         title: "Erro",
         description: "O setor que enviou o documento não pode recebê-lo.",
-
         className: "bg-red-500 text-white",
       })
       return
@@ -134,7 +136,7 @@ const ReceiveDocumentModal = ({
               </label>
               <Input
                 type="text"
-                value={sectorShipping}
+                value={documentCreate.sectorShipping}
                 className="w-full"
                 readOnly
               />

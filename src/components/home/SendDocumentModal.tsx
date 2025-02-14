@@ -33,8 +33,6 @@ const SendDocumentModal = ({
   const [description, setDescription] = useState(documentCreate.description)
   const [attachment, setAttachment] = useState<File | null>(null)
 
-  console.log("document:", documentCreate)
-
   useEffect(() => {
     setSectorShipping(documentCreate.sectorShipping || "")
     if (documentCreate.file) {
@@ -56,6 +54,7 @@ const SendDocumentModal = ({
       })
       return
     }
+
     console.log("Payload enviado:", {
       documentId: documentCreate.id,
       receivingDepartmentId: Number(receivingSector),
@@ -81,8 +80,6 @@ const SendDocumentModal = ({
         })
       }
 
-      const data = await response.json()
-      console.log("Documentos enviados:", data)
       toast({
         title: "Sucesso",
         description: `Documento enviado para setor ${receivingSector} com sucesso`,

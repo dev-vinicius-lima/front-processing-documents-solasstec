@@ -18,8 +18,6 @@ const useSendDocument = () => {
       if (!response.ok) {
         throw new Error("Erro ao buscar documentos")
       }
-      const data = await response.json()
-      console.log("Documentos recebidos:", data)
     } catch (err) {
       console.log(err)
     }
