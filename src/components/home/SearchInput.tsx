@@ -7,7 +7,7 @@ import usePagination from "@/hooks/usePagination"
 import useSearch from "@/hooks/useSearch"
 import { useDocumentDeletion } from "@/hooks/useDocumentDeletion"
 import { toast } from "@/hooks/use-toast"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import SendDocumentModal from "./SendDocumentModal"
 // import useReceiveDocument from "@/hooks/useReceiveDocument"
 import ReceiveDocumentModal from "./ReceiveDocumentModal"
@@ -50,6 +50,9 @@ const TableWithInputs = () => {
   const { refetch } = useDocuments()
   // const { receiveDocument } = useReceiveDocument()
 
+  useEffect(() => {
+    refetch()
+  }, [refetch])
   const handleSendClick = (document: IDocument) => {
     setSelectedDocument(document)
     setIsModalOpen(true)
@@ -199,7 +202,7 @@ const TableWithInputs = () => {
                   className={`cursor-pointer text-green-600 hover:text-green-800 ${
                     item.isReceived ||
                     item.sectorShipping === item.ReceivingSector
-                      ? "opacity-50 cursor-not-allowed"
+                      ? "opacity-50 cursor-auto disabled"
                       : ""
                   }`}
                   onClick={() =>
