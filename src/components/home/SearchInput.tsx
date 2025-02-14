@@ -160,7 +160,8 @@ const TableWithInputs = () => {
                 <FileDown className="cursor-pointer text-green-600 hover:text-green-800" />
                 <FileUp
                   className="cursor-pointer text-cyan-600 :hover:text-cyan-800"
-                  onClick={() => handleSendClick(item)}
+                  onClick={() => !item.isSend && handleSendClick(item)}
+                  style={{ opacity: item.isSend ? 0.5 : 1, cursor: "auto" }}
                 />
                 <Edit className="cursor-pointer text-blue-500" />
                 <Trash

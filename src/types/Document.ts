@@ -10,4 +10,5 @@ export interface IDocument {
   file: string
   createdAt: string
   departmentId: number | null
+  isSend?: boolean
 }
