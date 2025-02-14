@@ -25,7 +25,7 @@ const ButtonRegisterDocuments = () => {
 
       {isOpenModal && (
         <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-80">
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white w-1/2 h-[80%] rounded shadow-sm gap-4">
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white w-1/2 h-[85%] rounded shadow-sm gap-4">
             <div className="flex justify-end p-4 border-b">
               <div className="flex justify-between w-full">
                 <h2 className="text-2xl font-bold">Novo documento</h2>

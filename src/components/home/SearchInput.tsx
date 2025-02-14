@@ -1,12 +1,14 @@
 "use client"
 import { Input } from "../ui/input"
-import { Edit, Paperclip, Search, Trash } from "lucide-react"
+import { Edit, FileDown, FileUp, Paperclip, Search, Trash } from "lucide-react"
 import useDocuments from "@/hooks/useDocuments"
 import { IDocument } from "@/types/Document"
 import usePagination from "@/hooks/usePagination"
 import useSearch from "@/hooks/useSearch"
 import { useDocumentDeletion } from "@/hooks/useDocumentDeletion"
 import { toast } from "@/hooks/use-toast"
+import { useState } from "react"
+import SendDocumentModal from "./SendDocumentModal"
 
 const InputWithIcon = ({
   type,
@@ -38,9 +40,15 @@ const TableWithInputs = () => {
     documents,
     5
   )
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [selectedDocument, setSelectedDocument] = useState<IDocument | null>()
   const { deleteDocument } = useDocumentDeletion()
   const { refetch } = useDocuments()
 
+  const handleSendClick = (document: IDocument) => {
+    setSelectedDocument(document)
+    setIsModalOpen(true)
+  }
   const handleDelete = async (documentId: number) => {
     try {
       await deleteDocument(String(documentId))
@@ -149,6 +157,12 @@ const TableWithInputs = () => {
               </td>
 
               <td className="flex items-center justify-center gap-4 border border-slate-200 p-2">
+                <FileDown color="#01f9c7" className="cursor-pointer" />
+                <FileUp
+                  color="#05f901"
+                  className="cursor-pointer"
+                  onClick={() => handleSendClick(item)}
+                />
                 <Edit className="cursor-pointer text-blue-500" />
                 <Trash
                   className="cursor-pointer text-red-500"
@@ -159,6 +173,13 @@ const TableWithInputs = () => {
           ))}
         </tbody>
       </table>
+
+      <SendDocumentModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        document={selectedDocument || ({} as IDocument)}
+      />
+
       <div className="flex justify-between mt-4">
         <button
           onClick={prevPage}

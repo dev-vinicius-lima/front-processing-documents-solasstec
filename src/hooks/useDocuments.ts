@@ -13,6 +13,8 @@ const useDocuments = () => {
         throw new Error("Erro ao buscar documentos")
       }
       const data = await response.json()
+      console.log("Documentos recebidos:", data) // Adicione este log
+
       setDocuments(data)
     } catch (err) {
       if (err instanceof Error) {
