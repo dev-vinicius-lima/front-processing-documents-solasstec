@@ -11,4 +11,5 @@ export interface IDocument {
   createdAt: string
   departmentId: number | null
   isSend?: boolean
+  isReceived?: boolean
 }

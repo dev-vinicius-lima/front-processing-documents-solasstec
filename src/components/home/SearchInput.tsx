@@ -9,6 +9,8 @@ import { useDocumentDeletion } from "@/hooks/useDocumentDeletion"
 import { toast } from "@/hooks/use-toast"
 import { useState } from "react"
 import SendDocumentModal from "./SendDocumentModal"
+// import useReceiveDocument from "@/hooks/useReceiveDocument"
+import ReceiveDocumentModal from "./ReceiveDocumentModal"
 
 const InputWithIcon = ({
   type,
@@ -41,14 +43,50 @@ const TableWithInputs = () => {
     5
   )
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isReceiveModalOpen, setIsReceiveModalOpen] = useState(false)
+
   const [selectedDocument, setSelectedDocument] = useState<IDocument | null>()
   const { deleteDocument } = useDocumentDeletion()
   const { refetch } = useDocuments()
+  // const { receiveDocument } = useReceiveDocument()
 
   const handleSendClick = (document: IDocument) => {
     setSelectedDocument(document)
     setIsModalOpen(true)
   }
+
+  const handleReceiveClick = async (document: IDocument) => {
+    const currentSector = document.sectorShipping
+    if (document.isReceived) {
+      toast({
+        title: "Erro",
+        description: "Este documento já foi recebido.",
+        className: "bg-red-500 text-white",
+      })
+      return
+    }
+    if (currentSector === document.ReceivingSector) {
+      toast({
+        title: "Erro",
+        description:
+          "Você não pode receber um documento que ainda não foi enviado.",
+        className: "bg-red-500 text-white",
+      })
+      return
+    }
+
+    if (document.sectorShipping === document.ReceivingSector) {
+      toast({
+        title: "Erro",
+        description: "O setor que enviou o documento não pode recebê-lo.",
+        className: "bg-red-500 text-white",
+      })
+      return
+    }
+    setIsReceiveModalOpen(true)
+    setSelectedDocument(document)
+  }
+
   const handleDelete = async (documentId: number) => {
     try {
       await deleteDocument(String(documentId))
@@ -157,7 +195,20 @@ const TableWithInputs = () => {
               </td>
 
               <td className="flex items-center justify-center gap-4 border border-slate-200 p-2">
-                <FileDown className="cursor-pointer text-green-600 hover:text-green-800" />
+                <FileDown
+                  className={`cursor-pointer text-green-600 hover:text-green-800 ${
+                    item.isReceived ||
+                    item.sectorShipping === item.ReceivingSector
+                      ? "opacity-50 cursor-not-allowed"
+                      : ""
+                  }`}
+                  onClick={() =>
+                    !item.isReceived &&
+                    item.sectorShipping !== item.ReceivingSector
+                      ? handleReceiveClick(item)
+                      : null
+                  }
+                />
                 <FileUp
                   className="cursor-pointer text-cyan-600 :hover:text-cyan-800"
                   onClick={() => !item.isSend && handleSendClick(item)}
@@ -178,6 +229,13 @@ const TableWithInputs = () => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         document={selectedDocument || ({} as IDocument)}
+      />
+
+      <ReceiveDocumentModal
+        isOpen={isReceiveModalOpen}
+        onClose={() => setIsReceiveModalOpen(false)}
+        document={selectedDocument || ({} as IDocument)}
+        setDocuments={setDocuments}
       />
 
       <div className="flex justify-between mt-4">
