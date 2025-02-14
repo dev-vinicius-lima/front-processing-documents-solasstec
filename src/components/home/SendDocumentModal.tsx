@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "../ui/select"
 import useDepartments from "@/hooks/useDepartments"
+import { toast } from "@/hooks/use-toast"
 
 interface SendDocumentModalProps {
   isOpen: boolean
@@ -22,33 +23,78 @@ interface SendDocumentModalProps {
 const SendDocumentModal = ({
   isOpen,
   onClose,
-  document,
+  document: documentCreate,
 }: SendDocumentModalProps) => {
   const [sectorShipping, setSectorShipping] = useState(
-    document.sectorShipping || ""
+    documentCreate.sectorShipping || ""
   )
   const { departments } = useDepartments()
   const [receivingSector, setReceivingSector] = useState("")
-  const [description, setDescription] = useState(document.description)
+  const [description, setDescription] = useState(documentCreate.description)
   const [attachment, setAttachment] = useState<File | null>(null)
 
-  useEffect(() => {
-    setSectorShipping(document.sectorShipping || "")
-    if (document.file) {
-      setAttachment(null)
-    }
-  }, [document.file, document.sectorShipping])
+  console.log("document:", documentCreate)
 
-  const handleSubmit = () => {
-    console.log("Documento enviado:", {
-      sectorShipping,
-      receivingSector,
-      description,
-      attachment: attachment || document.file,
+  useEffect(() => {
+    setSectorShipping(documentCreate.sectorShipping || "")
+    if (documentCreate.file) {
+      setAttachment(null)
+      setDescription(documentCreate.description)
+    }
+  }, [
+    documentCreate.description,
+    documentCreate.file,
+    documentCreate.sectorShipping,
+  ])
+
+  const handleSubmit = async () => {
+    if (!receivingSector) {
+      toast({
+        title: "Erro",
+        description: "Por favor, selecione o setor de recebimento",
+        className: "bg-red-500 text-white",
+      })
+      return
+    }
+    console.log("Payload enviado:", {
+      documentId: documentCreate.id,
+      receivingDepartmentId: Number(receivingSector),
     })
+    try {
+      const response = await fetch("http://localhost:3333/documents/send", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          documentId: Number(documentCreate.id),
+          receivingDepartmentId: Number(receivingSector),
+        }),
+      })
+
+      if (!response.ok) {
+        const erroData = await response.json()
+        toast({
+          title: "Erro",
+          description: erroData.message,
+          className: "bg-red-500 text-white",
+        })
+      }
+
+      const data = await response.json()
+      console.log("Documentos enviados:", data)
+      toast({
+        title: "Sucesso",
+        description: `Documento enviado para setor ${receivingSector} com sucesso`,
+        className: "bg-green-500 text-white",
+      })
+    } catch (error) {
+      console.error("Erro:", error)
+    }
 
     onClose()
   }
+
   const getLocalDateTime = () => {
     const now = new Date()
     const offset = now.getTimezoneOffset()
@@ -94,7 +140,7 @@ const SendDocumentModal = ({
                     {departments.map((department) => (
                       <SelectItem
                         key={department.id}
-                        value={department.acronym}
+                        value={department.id.toString()}
                       >
                         {department.acronym}
                       </SelectItem>
@@ -111,7 +157,7 @@ const SendDocumentModal = ({
               </label>
               <Input
                 type="text"
-                value={document.id.toString()}
+                value={documentCreate.id.toString()}
                 className="w-full"
                 readOnly
               />
@@ -120,7 +166,7 @@ const SendDocumentModal = ({
               <label className="block text-sm font-medium mb-1">Título</label>
               <Input
                 type="text"
-                value={document.title}
+                value={documentCreate.title}
                 className="w-full"
                 readOnly
               />
@@ -131,7 +177,7 @@ const SendDocumentModal = ({
               </label>
               <Input
                 type="text"
-                value={document.type}
+                value={documentCreate.type}
                 className="w-full"
                 readOnly
               />
@@ -177,16 +223,33 @@ const SendDocumentModal = ({
               <Input
                 type="file"
                 onChange={(e) => setAttachment(e.target.files?.[0] || null)}
-                className="w-full"
+                className="absolute opacity-0 bg-black cursor-pointer"
+                onClick={() => document.querySelector('input[type="file"]')}
               />
+              {attachment ? (
+                <span className="text-sm">{attachment.name}</span>
+              ) : (
+                documentCreate.file && (
+                  <span className="text-sm">{documentCreate.file}</span>
+                )
+              )}
             </div>
           </div>
           {/* Ações */}
-          <div className="flex justify-end gap-2">
-            <Button onClick={onClose} variant="outline">
+          <div className="flex justify-end gap-4">
+            <Button
+              onClick={onClose}
+              variant="outline"
+              className="w-1/6 text-red-600"
+            >
               CANCELAR
             </Button>
-            <Button onClick={handleSubmit}>ENVIAR</Button>
+            <Button
+              onClick={handleSubmit}
+              className="bg-blue-600 hover:bg-blue-800 w-1/6"
+            >
+              ENVIAR
+            </Button>
           </div>
         </div>
       </div>

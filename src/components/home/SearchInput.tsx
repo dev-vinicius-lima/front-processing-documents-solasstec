@@ -157,10 +157,9 @@ const TableWithInputs = () => {
               </td>
 
               <td className="flex items-center justify-center gap-4 border border-slate-200 p-2">
-                <FileDown color="#01f9c7" className="cursor-pointer" />
+                <FileDown className="cursor-pointer text-green-600 hover:text-green-800" />
                 <FileUp
-                  color="#05f901"
-                  className="cursor-pointer"
+                  className="cursor-pointer text-cyan-600 :hover:text-cyan-800"
                   onClick={() => handleSendClick(item)}
                 />
                 <Edit className="cursor-pointer text-blue-500" />
