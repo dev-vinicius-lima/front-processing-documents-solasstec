@@ -11,6 +11,7 @@ import { useEffect, useState } from "react"
 import SendDocumentModal from "./SendDocumentModal"
 // import useReceiveDocument from "@/hooks/useReceiveDocument"
 import ReceiveDocumentModal from "./ReceiveDocumentModal"
+import { format } from "date-fns"
 
 const InputWithIcon = ({
   type,
@@ -181,13 +182,25 @@ const TableWithInputs = () => {
                 {item.sectorShipping}
               </td>
               <td className="border border-slate-200 p-2">
-                {item.dateTimeSubmission}
+                {item.dateTimeSubmission &&
+                !isNaN(new Date(item.dateTimeSubmission).getTime())
+                  ? format(
+                      new Date(item.dateTimeSubmission),
+                      "dd/MM/yyyy - HH:mm"
+                    )
+                  : "N/A"}
               </td>
               <td className="border border-slate-200 p-2">
                 {item.ReceivingSector}
               </td>
               <td className="border border-slate-200 p-2">
-                {item.dateTimeReceived}
+                {item.dateTimeReceived &&
+                !isNaN(new Date(item.dateTimeReceived).getTime())
+                  ? format(
+                      new Date(item.dateTimeReceived),
+                      "dd/MM/yyyy - HH:mm"
+                    )
+                  : "N/A"}
               </td>
               <td className="border border-slate-200 p-2">
                 <Paperclip
