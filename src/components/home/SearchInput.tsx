@@ -1,6 +1,6 @@
 "use client"
 import { Input } from "../ui/input"
-import { Edit, FileDown, FileUp, Paperclip, Search, Trash } from "lucide-react"
+import { FileDown, FileUp, Paperclip, Search, Trash } from "lucide-react"
 import useDocuments from "@/hooks/useDocuments"
 import { IDocument } from "@/types/Document"
 import usePagination from "@/hooks/usePagination"
@@ -9,9 +9,9 @@ import { useDocumentDeletion } from "@/hooks/useDocumentDeletion"
 import { toast } from "@/hooks/use-toast"
 import { useEffect, useState } from "react"
 import SendDocumentModal from "./SendDocumentModal"
-// import useReceiveDocument from "@/hooks/useReceiveDocument"
 import ReceiveDocumentModal from "./ReceiveDocumentModal"
 import { format } from "date-fns"
+import useDownloadFile from "@/hooks/useDownloadFile"
 
 const InputWithIcon = ({
   type,
@@ -49,6 +49,7 @@ const TableWithInputs = () => {
   const [selectedDocument, setSelectedDocument] = useState<IDocument | null>()
   const { deleteDocument } = useDocumentDeletion()
   const { refetch } = useDocuments()
+  const { downloadFile } = useDownloadFile()
 
   useEffect(() => {
     refetch()
@@ -224,6 +225,17 @@ const TableWithInputs = () => {
                   size={30}
                   strokeWidth={1}
                   className="cursor-pointer mx-auto"
+                  onClick={() => {
+                    if (item.file) {
+                      downloadFile(item.file)
+                    } else {
+                      toast({
+                        title: "Erro",
+                        description: "Não existe arquivo em anexo.",
+                        className: "bg-red-500 text-white",
+                      })
+                    }
+                  }}
                 />
               </td>
 
@@ -269,7 +281,6 @@ const TableWithInputs = () => {
                         : "not-allowed",
                   }}
                 />
-                <Edit className="cursor-pointer text-blue-500" />
                 <Trash
                   className="cursor-pointer text-red-500"
                   onClick={() => handleDelete?.(item.id)}
