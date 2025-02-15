@@ -22,6 +22,7 @@ import { useEffect, useState } from "react"
 import useDepartments from "@/hooks/useDepartments"
 
 interface DocumentMovement {
+  fileName: string
   id: number
   type: string
   title: string
@@ -61,6 +62,15 @@ export default function DocumentMovementHistory() {
 
     fetchDocuments()
   }, [])
+
+  const handleDownload = (fileName: string) => {
+    const link = document.createElement("a")
+    link.href = `http://localhost:3333/documents/download/${fileName}`
+    link.download = fileName
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
 
   const filteredDocuments = documents.filter((doc) => {
     const matchesId = documentId ? doc.id.toString() === documentId : true
@@ -225,6 +235,9 @@ export default function DocumentMovementHistory() {
                             variant="outline"
                             size="icon"
                             className="h-8 w-8"
+                            onClick={() => {
+                              handleDownload(doc.file)
+                            }}
                           >
                             <Download className="h-4 w-4" />
                             <span className="sr-only">Download</span>
