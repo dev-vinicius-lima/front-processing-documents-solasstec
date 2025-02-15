@@ -46,6 +46,7 @@ export default function DepartmentsPage() {
   const { departments, refetch: refetchDepartments } = useFetchDepartments()
   const { createDepartment, loading, error } = useCreateDepartment()
   const { deleteDepartment } = useDeleteDepartment()
+
   const {
     editDepartment: editDepartmentAPI,
     loading: loadingEdit,
@@ -111,13 +112,15 @@ export default function DepartmentsPage() {
     <div className="min-h-screen bg-[#F5F7FB]">
       <Header />
 
-      <main className="container mx-auto py-8 px-4">
-        <div className="bg-white rounded-lg shadow p-6">
+      <main className="flex items-center justify-center mx-auto py-10 px-6">
+        <div className="bg-white rounded-lg  p-6 w-[80%] shadow-lg">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold">Lista de Departamentos</h2>
+            <h2 className="text-xl font-semibold border-b-2 border-[#4B87E2] pb-1">
+              Lista de Departamentos
+            </h2>
             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
               <DialogTrigger asChild>
-                <Button className="bg-[#4B87E2] hover:bg-[#2C4B9C]">
+                <Button className="bg-[#4B87E2] hover:bg-[#2C4B9C] w-1/6">
                   <Plus className="w-4 h-4 mr-2" />
                   Criar Departamento
                 </Button>

@@ -19,6 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { useEffect, useState } from "react"
+import useDepartments from "@/hooks/useDepartments"
 
 interface DocumentMovement {
   id: number
@@ -42,43 +43,11 @@ export default function DocumentMovementHistory() {
   const [documents, setDocuments] = useState<DocumentMovement[]>([])
   const [currentPage, setCurrentPage] = useState(1)
   const documentsPerPage = 5
-  // const documents: DocumentMovement[] = [
-  //   {
-  //     id: 3,
-  //     type: "Report 2",
-  //     title: "Annual report",
-  //     description: "report description...",
-  //     file: "1739389083623-ViniciusLima2.0.pdf",
-  //     createdAt: "2025-02-12T19:38:03.627Z",
-  //     updatedAt: "2025-02-13T01:05:02.511Z",
-  //     departmentId: 1,
-  //     sectorShipping: null,
-  //     isReceived: true,
-  //     dateTimeReceived: "2025-02-14T20:04:09.501Z",
-  //     trackingHistory: [
-  //       {
-  //         id: 16,
-  //         documentId: 3,
-  //         sendingDept: 1,
-  //         receivingDept: 4,
-  //         dateTime: "2025-02-14T19:55:06.865Z",
-  //         departmentId: 1,
-  //         createdAt: "2025-02-14T19:55:06.865Z",
-  //         sendingDeptRef: {
-  //           id: 1,
-  //           acronym: "IT",
-  //           description: "Information Technology",
-  //         },
-  //         receivingDeptRef: {
-  //           id: 4,
-  //           acronym: "Front End",
-  //           description: "User Interface",
-  //         },
-  //       },
-  //     ],
-  //     status: "Received",
-  //   },
-  // ]
+  const [documentId, setDocumentId] = useState("")
+  const [selectedDepartment, setSelectedDepartment] = useState("")
+  const [selectedDate, setSelectedDate] = useState("")
+  const { departments, loading, error } = useDepartments()
+
   useEffect(() => {
     const fetchDocuments = async () => {
       try {
@@ -93,14 +62,40 @@ export default function DocumentMovementHistory() {
     fetchDocuments()
   }, [])
 
+  const filteredDocuments = documents.filter((doc) => {
+    const matchesId = documentId ? doc.id.toString() === documentId : true
+
+    const matchesDepartment =
+      selectedDepartment && doc.history.length > 0
+        ? doc.history.some((h) =>
+            departments.some(
+              (dept) =>
+                dept.acronym === selectedDepartment &&
+                h.receivingDepartment === dept.description
+            )
+          )
+        : true
+
+    const matchesDate = selectedDate
+      ? format(new Date(doc.createdAt), "yyyy-MM-dd") === selectedDate
+      : true
+
+    return matchesId && matchesDepartment && matchesDate
+  })
+
+  // Logs para depuração
+  console.log("Selected Department:", selectedDepartment)
+  console.log("Documents:", documents)
+  console.log("Filtered Documents:", filteredDocuments)
+
   const indexOfLastDocument = currentPage * documentsPerPage
   const indexOfFirstDocument = indexOfLastDocument - documentsPerPage
-  const currentDocuments = documents.slice(
+  const currentDocuments = filteredDocuments.slice(
     indexOfFirstDocument,
     indexOfLastDocument
   )
 
-  const totalPages = Math.ceil(documents.length / documentsPerPage)
+  const totalPages = Math.ceil(filteredDocuments.length / documentsPerPage)
 
   return (
     <div className="w-full bg-slate-200">
@@ -108,7 +103,7 @@ export default function DocumentMovementHistory() {
         <div className="bg-white h-[85%] rounded-lg shadow-lg w-[80%]">
           <div className="p-6">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold bg-blue-200 rounded-md p-3">
+              <h2 className="text-xl font-semibold p-3 border-b-2 border-[#4B87E2] pb-1">
                 Histórico de tramitações de documentos
               </h2>
             </div>
@@ -116,18 +111,53 @@ export default function DocumentMovementHistory() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <div className="relative">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-                <Input placeholder="Document ID" className="pl-8" />
+                <Input
+                  placeholder="Document ID"
+                  className="pl-8"
+                  value={documentId}
+                  onChange={(e) => setDocumentId(e.target.value)}
+                />
               </div>
-              <Select>
+              <Select
+                onValueChange={setSelectedDepartment}
+                value={selectedDepartment || undefined} // Permite resetar
+              >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select Department" />
+                  <SelectValue placeholder="Selecionar Departamento" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="TI">Tecnologia da Informação</SelectItem>
-                  <SelectItem value="FrontEnd">Front End</SelectItem>
+                  {loading && (
+                    <SelectItem value="loading" disabled>
+                      Carregando...
+                    </SelectItem>
+                  )}
+                  {error && (
+                    <SelectItem value="error" disabled>
+                      {error}
+                    </SelectItem>
+                  )}
+                  {!loading &&
+                    !error &&
+                    departments.map((dept) => (
+                      <SelectItem key={dept.id} value={dept.acronym}>
+                        {dept.description}
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
-              <Input type="date" />
+
+              <Input
+                type="date"
+                value={selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value)}
+              />
+              <Button
+                onClick={() => setSelectedDepartment("")}
+                variant="outline"
+                className="ml-2 w-[25%]"
+              >
+                Limpar Filtro
+              </Button>
             </div>
 
             <div className="rounded-md border">
@@ -140,7 +170,6 @@ export default function DocumentMovementHistory() {
                     <TableHead>Data de envio</TableHead>
                     <TableHead>Setor Recebimento</TableHead>
                     <TableHead>Data Recebimento</TableHead>
-
                     <TableHead>Status</TableHead>
                     <TableHead className="w-[100px]">Ações</TableHead>
                   </TableRow>
@@ -164,7 +193,9 @@ export default function DocumentMovementHistory() {
                         {format(new Date(doc.createdAt), "dd/MM/yyyy - HH:mm")}
                       </TableCell>
                       <TableCell>
-                        {doc.history.map((h) => h.receivingDepartment) || "N/A"}
+                        {doc.history
+                          .map((h) => h.receivingDepartment)
+                          .join(", ") || "N/A"}
                       </TableCell>
                       <TableCell>
                         {doc.history.length > 0
@@ -214,8 +245,8 @@ export default function DocumentMovementHistory() {
             <div className="flex items-center justify-between mt-4">
               <div className="text-sm text-gray-500">
                 Mostrando {indexOfFirstDocument + 1} a{" "}
-                {Math.min(indexOfLastDocument, documents.length)} de{" "}
-                {documents.length} entradas
+                {Math.min(indexOfLastDocument, filteredDocuments.length)} de{" "}
+                {filteredDocuments.length} entradas
               </div>
               <div className="flex gap-2">
                 <Button
@@ -230,7 +261,7 @@ export default function DocumentMovementHistory() {
                   disabled={currentPage === totalPages}
                   onClick={() => setCurrentPage(currentPage + 1)}
                 >
-                  Próximo
+                  Próximo
                 </Button>
               </div>
             </div>
