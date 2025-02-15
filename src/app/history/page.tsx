@@ -1,5 +1,5 @@
 import HistoryPage from "@/components/historyPage"
-import Header from "@/components/home/Header"
+import Header from "@/components/Header"
 import React from "react"
 
 const page = () => {
