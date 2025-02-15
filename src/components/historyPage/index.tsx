@@ -83,11 +83,6 @@ export default function DocumentMovementHistory() {
     return matchesId && matchesDepartment && matchesDate
   })
 
-  // Logs para depuração
-  console.log("Selected Department:", selectedDepartment)
-  console.log("Documents:", documents)
-  console.log("Filtered Documents:", filteredDocuments)
-
   const indexOfLastDocument = currentPage * documentsPerPage
   const indexOfFirstDocument = indexOfLastDocument - documentsPerPage
   const currentDocuments = filteredDocuments.slice(
@@ -100,7 +95,7 @@ export default function DocumentMovementHistory() {
   return (
     <div className="w-full bg-slate-200">
       <div className="py-8 w-full h-[calc(100vh-64px)] flex justify-center items-center">
-        <div className="bg-white h-[85%] rounded-lg shadow-lg w-[80%]">
+        <div className="bg-white h-[95%] rounded-lg shadow-lg w-[80%]">
           <div className="p-6">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-semibold p-3 border-b-2 border-[#4B87E2] pb-1">
@@ -120,7 +115,7 @@ export default function DocumentMovementHistory() {
               </div>
               <Select
                 onValueChange={setSelectedDepartment}
-                value={selectedDepartment || undefined} // Permite resetar
+                value={selectedDepartment || undefined}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Selecionar Departamento" />

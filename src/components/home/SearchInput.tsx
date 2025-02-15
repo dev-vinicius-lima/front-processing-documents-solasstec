@@ -49,12 +49,21 @@ const TableWithInputs = () => {
   const [selectedDocument, setSelectedDocument] = useState<IDocument | null>()
   const { deleteDocument } = useDocumentDeletion()
   const { refetch } = useDocuments()
-  // const { receiveDocument } = useReceiveDocument()
 
   useEffect(() => {
     refetch()
   }, [refetch])
   const handleSendClick = (document: IDocument) => {
+    if (document.isSend && !document.isReceived) return
+
+    setDocuments((prevDocuments) =>
+      prevDocuments.map((doc) =>
+        doc.id === document.id
+          ? { ...doc, isSend: true, isReceived: false }
+          : doc
+      )
+    )
+
     setSelectedDocument(document)
     setIsModalOpen(true)
   }
@@ -87,6 +96,14 @@ const TableWithInputs = () => {
       })
       return
     }
+
+    setDocuments((prevDocuments) =>
+      prevDocuments.map((doc) =>
+        doc.id === document.id
+          ? { ...doc, isReceived: true, isSend: false }
+          : doc
+      )
+    )
     setIsReceiveModalOpen(true)
     setSelectedDocument(document)
   }
@@ -212,11 +229,10 @@ const TableWithInputs = () => {
 
               <td className="flex items-center justify-center gap-4 border border-slate-200 p-2">
                 <FileDown
-                  className={
-                    "cursor-pointer text-green-600 :hover:text-green-800"
-                  }
+                  className="cursor-pointer text-green-600 hover:text-green-800"
                   onClick={() => {
                     if (
+                      item.isSend &&
                       !item.isReceived &&
                       item.sectorShipping !== item.ReceivingSector
                     ) {
@@ -224,19 +240,33 @@ const TableWithInputs = () => {
                     }
                   }}
                   style={{
-                    opacity: item.isReceived || !item.sectorShipping ? 0.5 : 1,
+                    opacity:
+                      item.isSend &&
+                      !item.isReceived &&
+                      item.sectorShipping !== item.ReceivingSector
+                        ? 1
+                        : 0.5,
                     cursor:
-                      item.isReceived || !item.sectorShipping
-                        ? "not-allowed"
-                        : "pointer",
+                      item.isSend &&
+                      !item.isReceived &&
+                      item.sectorShipping !== item.ReceivingSector
+                        ? "pointer"
+                        : "not-allowed",
                   }}
                 />
                 <FileUp
-                  className="cursor-pointer text-cyan-600 :hover:text-cyan-800"
-                  onClick={() => !item.isSend && handleSendClick(item)}
+                  className="cursor-pointer text-cyan-600 hover:text-cyan-800"
+                  onClick={() => {
+                    if (!item.isSend || item.isReceived) {
+                      handleSendClick(item)
+                    }
+                  }}
                   style={{
-                    opacity: item.isSend ? 0.5 : 1,
-                    cursor: item.isSend ? "not-allowed" : "pointer",
+                    opacity: !item.isSend || item.isReceived ? 1 : 0.5,
+                    cursor:
+                      !item.isSend || item.isReceived
+                        ? "pointer"
+                        : "not-allowed",
                   }}
                 />
                 <Edit className="cursor-pointer text-blue-500" />
