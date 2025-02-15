@@ -23,8 +23,9 @@ import {
 import Header from "../Header"
 import { useCreateDepartment } from "@/hooks/useCreateDepartment"
 import { useFetchDepartments } from "@/hooks/useFetchDepartments"
-import { toast } from "@/hooks/use-toast"
 import { useDeleteDepartment } from "@/hooks/useDeleteDepartment"
+import { useEditDepartment } from "@/hooks/useEditDepartment"
+import { toast } from "@/hooks/use-toast"
 
 interface Department {
   id: number
@@ -45,8 +46,21 @@ export default function DepartmentsPage() {
   const { departments, refetch: refetchDepartments } = useFetchDepartments()
   const { createDepartment, loading, error } = useCreateDepartment()
   const { deleteDepartment } = useDeleteDepartment()
+  const {
+    editDepartment: editDepartmentAPI,
+    loading: loadingEdit,
+    error: editError,
+  } = useEditDepartment()
 
   const handleCreate = async () => {
+    if (!newDepartment.acronym || !newDepartment.description) {
+      toast({
+        title: "Erro",
+        description: "Preencha todos os campos!",
+        className: "bg-red-500 text-white",
+      })
+      return
+    }
     if (newDepartment.acronym && newDepartment.description) {
       const createdDepartment = await createDepartment(newDepartment)
       if (createdDepartment) {
@@ -57,13 +71,28 @@ export default function DepartmentsPage() {
           description: "Departamento criado com sucesso!",
           className: "bg-green-500 text-white",
         })
+
+        refetchDepartments()
       }
-      refetchDepartments()
     }
   }
 
-  const handleEdit = (department: Department) => {
-    setEditingDepartment(department)
+  const handleEdit = async () => {
+    if (editingDepartment) {
+      const updatedData = {
+        acronym: editingDepartment.acronym,
+        description: editingDepartment.description,
+      }
+      await editDepartmentAPI(editingDepartment.id, updatedData)
+      toast({
+        title: "Sucesso",
+        description: "Departamento editado com sucesso!",
+        className: "bg-green-500 text-white",
+      })
+      setEditingDepartment(null)
+      refetchDepartments()
+      setIsModalOpen(false)
+    }
   }
 
   const handleDelete = async (id: number) => {
@@ -77,6 +106,7 @@ export default function DepartmentsPage() {
       refetchDepartments()
     }
   }
+
   return (
     <div className="min-h-screen bg-[#F5F7FB]">
       <Header />
@@ -94,19 +124,32 @@ export default function DepartmentsPage() {
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Criar Novo Departamento</DialogTitle>
+                  <DialogTitle>
+                    {editingDepartment
+                      ? "Editar Departamento"
+                      : "Criar Novo Departamento"}
+                  </DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4 py-4">
                   <div className="space-y-2">
                     <label>Sigla Do Departamento</label>
                     <Input
                       placeholder="Insira a sigla do departamento (por exemplo, RH, TI)"
-                      value={newDepartment.acronym.toUpperCase()}
+                      value={
+                        editingDepartment
+                          ? editingDepartment.acronym
+                          : newDepartment.acronym
+                      }
                       onChange={(e) =>
-                        setNewDepartment({
-                          ...newDepartment,
-                          acronym: e.target.value.toUpperCase(),
-                        })
+                        editingDepartment
+                          ? setEditingDepartment({
+                              ...editingDepartment,
+                              acronym: e.target.value.toUpperCase(),
+                            })
+                          : setNewDepartment({
+                              ...newDepartment,
+                              acronym: e.target.value.toUpperCase(),
+                            })
                       }
                     />
                   </div>
@@ -114,33 +157,51 @@ export default function DepartmentsPage() {
                     <label>Descrição do Departamento</label>
                     <Textarea
                       placeholder="Insira uma descrição do departamento..."
-                      value={newDepartment.description}
+                      value={
+                        editingDepartment
+                          ? editingDepartment.description
+                          : newDepartment.description
+                      }
                       onChange={(e) =>
-                        setNewDepartment({
-                          ...newDepartment,
-                          description: e.target.value,
-                        })
+                        editingDepartment
+                          ? setEditingDepartment({
+                              ...editingDepartment,
+                              description: e.target.value,
+                            })
+                          : setNewDepartment({
+                              ...newDepartment,
+                              description: e.target.value,
+                            })
                       }
                     />
                   </div>
                   <div className="flex justify-end gap-4">
                     <Button
                       variant="outline"
-                      onClick={() =>
+                      onClick={() => {
                         setNewDepartment({ acronym: "", description: "" })
-                      }
+                        setEditingDepartment(null)
+                      }}
                     >
                       Limpar Formulário
                     </Button>
                     <Button
                       className="bg-[#4B87E2] hover:bg-[#2C4B9C]"
-                      onClick={handleCreate}
-                      disabled={loading}
+                      onClick={editingDepartment ? handleEdit : handleCreate}
+                      disabled={loading || loadingEdit}
                     >
-                      {loading ? "Criando..." : "Criar Departamento"}
+                      {loading || loadingEdit
+                        ? editingDepartment
+                          ? "Editando..."
+                          : "Criando..."
+                        : editingDepartment
+                        ? "Salvar Alterações"
+                        : "Criar Departamento"}
                     </Button>
                   </div>
-                  {error && <p className="text-red-500">{error}</p>}{" "}
+                  {(error || editError) && (
+                    <p className="text-red-500">{error || editError}</p>
+                  )}
                 </div>
               </DialogContent>
             </Dialog>
@@ -169,60 +230,20 @@ export default function DepartmentsPage() {
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8"
+                            onClick={() => {
+                              setEditingDepartment(department)
+                              setIsModalOpen(true)
+                            }}
                           >
                             <Pencil className="h-4 w-4" />
                           </Button>
                         </DialogTrigger>
-                        <DialogContent>
-                          <DialogHeader>
-                            <DialogTitle>Editar Departamento</DialogTitle>
-                          </DialogHeader>
-                          <div className="space-y-4 py-4">
-                            <div className="space-y-2">
-                              <label>Sigla Do Departamento</label>
-                              <Input
-                                defaultValue={department.acronym}
-                                onChange={(e) =>
-                                  setEditingDepartment({
-                                    ...department,
-                                    acronym: e.target.value,
-                                  })
-                                }
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <label>Descrição do Departamento</label>
-                              <Textarea
-                                defaultValue={department.description}
-                                onChange={(e) =>
-                                  setEditingDepartment({
-                                    ...department,
-                                    description: e.target.value,
-                                  })
-                                }
-                              />
-                            </div>
-                            <div className="flex justify-end gap-4">
-                              <Button
-                                className="bg-[#4B87E2] hover:bg-[#2C4B9C]"
-                                onClick={() =>
-                                  editingDepartment &&
-                                  handleEdit(editingDepartment)
-                                }
-                              >
-                                Salvar Alterações
-                              </Button>
-                            </div>
-                          </div>
-                        </DialogContent>
                       </Dialog>
                       <Button
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8 text-red-500 hover:text-red-700"
-                        onClick={() => {
-                          handleDelete(department.id)
-                        }}
+                        onClick={() => handleDelete(department.id)}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>

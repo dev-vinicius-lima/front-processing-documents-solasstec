@@ -55,12 +55,6 @@ const Header = () => {
               Home
             </Button>
             <Button
-              onClick={() => route.push("/department")}
-              className="text-white decoration-none bg-blue-600 hover:bg-blue-800 mx-1"
-            >
-              Criar Departamento
-            </Button>
-            <Button
               onClick={() => route.push("/departmentManagement")}
               className="text-white decoration-none bg-blue-600 hover:bg-blue-800 mx-1"
             >
