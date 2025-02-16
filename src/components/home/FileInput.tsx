@@ -2,7 +2,6 @@
 import { useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Paperclip } from "lucide-react"
-// import { toast } from "@/hooks/use-toast"
 
 interface FileInputProps {
   buttonText?: string

@@ -1,140 +1,26 @@
-"use client"
-import React, { useEffect, useState } from "react"
 import { Input } from "../ui/input"
 import { Textarea } from "../ui/textarea"
 import FileInputComponent from "./FileInput"
 import { Button } from "../ui/button"
-import { toast } from "@/hooks/use-toast"
-import useDocuments from "@/hooks/useDocuments"
-import useDepartments from "@/hooks/useDepartments"
 import { IDocument } from "@/types/Document"
+import useFormRegisterDocument from "@/hooks/useCreateDocument"
 
 interface FormRegisterDocumentProps {
   onClose: () => void
   onNewDocument: (newDocument: IDocument) => void
 }
 
-interface FormData {
-  type: string
-  title: string
-  description: string
-  file: File | null
-  departmentId: string
-  sectorShipping: string
-}
-
 const FormRegisterDocument: React.FC<FormRegisterDocumentProps> = ({
   onClose,
   onNewDocument,
 }) => {
-  const [formData, setFormData] = useState<FormData>({
-    type: "",
-    title: "",
-    description: "",
-    file: null as File | null,
-    departmentId: "",
-    sectorShipping: "",
-  })
-  const { departments } = useDepartments()
-  const { refetch } = useDocuments()
-
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
-  ) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
-
-  useEffect(() => {
-    const department = departments.find(
-      (d) => d.id === Number(formData.departmentId)
-    )
-    if (department) {
-      console.log("Selected Department:", department)
-      setFormData((prev) => ({
-        ...prev,
-        sectorShipping: department.acronym,
-      }))
-    }
-  }, [formData.departmentId, departments])
-
-  const handleFileChange = (file: File | null) => {
-    setFormData((prev) => ({ ...prev, file }))
-  }
-
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-
-    const department = departments.find(
-      (d) => d.id === Number(formData.departmentId)
-    )
-    const updatedSectorShipping = department ? department.acronym : ""
-    console.log("Sector Shipping antes do envio::::", updatedSectorShipping)
-
-    const { type, title, description, file, departmentId } = formData
-
-    console.log("departmentId:", departmentId)
-
-    if (!type || !title || !description) {
-      toast({
-        title: "Erro ao enviar formulário",
-        description: "Preencha todos os campos.",
-        className: "bg-red-500 text-white",
-      })
-      return
-    }
-
-    const formPayload = new FormData()
-    formPayload.append("type", type)
-    formPayload.append("title", title)
-    formPayload.append("description", description)
-    formPayload.append("departmentId", String(Number(departmentId)))
-    formPayload.append("sectorShipping", updatedSectorShipping)
-    if (file && file.type === "application/pdf") {
-      formPayload.append("pdfFile", file)
-    } else {
-      toast({
-        title: "Erro ao enviar formulário",
-        description: "Selecione um arquivo PDF.",
-        className: "bg-red-500 text-white",
-      })
-      return
-    }
-
-    try {
-      const response = await fetch("http://localhost:3333/documents", {
-        method: "POST",
-        body: formPayload,
-      })
-      console.log("Response from API:", response)
-
-      if (!response.ok) {
-        const errorResponse = await response.json()
-        throw new Error(`Erro ao enviar formulário: ${errorResponse.message}`)
-      }
-
-      const newDocument = await response.json()
-      toast({
-        title: "Sucesso!",
-        description: "Documento cadastrado com sucesso.",
-        duration: 3000,
-      })
-      onNewDocument(newDocument)
-
-      await refetch()
-      if (typeof onClose === "function") {
-        onClose()
-      }
-    } catch (error) {
-      toast({
-        title: "Erro ao enviar formulário",
-        description: "Ocorreu um erro ao enviar o formulário. " + error,
-        className: "bg-red-500 text-white",
-      })
-    }
-  }
+  const {
+    formData,
+    handleChange,
+    handleFileChange,
+    handleSubmit,
+    departments,
+  } = useFormRegisterDocument(onClose, onNewDocument)
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-4">
