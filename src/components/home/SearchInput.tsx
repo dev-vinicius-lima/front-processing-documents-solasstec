@@ -63,6 +63,13 @@ const TableWithInputs = ({
   const handleSendClick = async (document: IDocument) => {
     if (document.isSend && !document.isReceived) return
 
+    const updatedDocument = {
+      ...document,
+      isSend: true,
+      isReceived: false,
+      dateTimeSubmission: new Date().toISOString().slice(0, 16),
+    }
+
     setDocuments((prevDocuments) =>
       prevDocuments.map((doc) =>
         doc.id === document.id
@@ -71,7 +78,7 @@ const TableWithInputs = ({
       )
     )
 
-    setSelectedDocument(document)
+    setSelectedDocument(updatedDocument)
     setIsModalOpen(true)
     await refetch()
   }
@@ -124,10 +131,10 @@ const TableWithInputs = ({
       )
       await refetch()
 
-      if (filteredData.length === 0 && currentPage > 1) {
+      if (currentDocuments.length === 1 && currentPage > 1) {
         prevPage()
       }
-
+      await refetch()
       toast({
         title: "Documento deletado com sucesso",
         description: "O documento foi deletado com sucesso.",
