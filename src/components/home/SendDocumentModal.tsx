@@ -14,17 +14,20 @@ import {
 } from "../ui/select"
 import useDepartments from "@/hooks/useDepartments"
 import { toast } from "@/hooks/use-toast"
+import { getLocalDateTime } from "@/utils/getLocalDateTime"
 
 interface SendDocumentModalProps {
   isOpen: boolean
   onClose: () => void
   document: IDocument
+  onDocumentSend: (updateDocument: IDocument) => void
 }
 
 const SendDocumentModal = ({
   isOpen,
   onClose,
   document: documentCreate,
+  onDocumentSend,
 }: SendDocumentModalProps) => {
   const [sectorShipping, setSectorShipping] = useState(
     documentCreate.sectorShipping || ""
@@ -77,14 +80,24 @@ const SendDocumentModal = ({
         return
       }
 
-      toast({
-        title: "Sucesso",
-        description: `Documento enviado para o setor ${
-          departments.find((dept) => dept.id.toString() === receivingSector)
-            ?.acronym
-        } com sucesso.`,
-        className: "bg-green-500 text-white",
-      })
+      if (response.ok) {
+        const updatedDocument = {
+          ...documentCreate,
+          isSend: true,
+          isReceived: false,
+          dateTimeSubmission: getLocalDateTime(),
+          ReceivingSector: getReceivingSectorAcronym(receivingSector),
+        }
+        onDocumentSend(updatedDocument)
+        toast({
+          title: "Sucesso",
+          description: `Documento enviado para o setor ${
+            departments.find((dept) => dept.id.toString() === receivingSector)
+              ?.acronym
+          } com sucesso.`,
+          className: "bg-green-500 text-white",
+        })
+      }
     } catch (error) {
       console.error("Erro:", error)
     }
@@ -92,11 +105,9 @@ const SendDocumentModal = ({
     onClose()
   }
 
-  const getLocalDateTime = () => {
-    const now = new Date()
-    const offset = now.getTimezoneOffset()
-    const localDateTime = new Date(now.getTime() - offset * 60 * 1000)
-    return localDateTime.toISOString().slice(0, 16)
+  const getReceivingSectorAcronym = (id: string) => {
+    const department = departments.find((dept) => dept.id.toString() === id)
+    return department ? department.acronym : "N/A"
   }
 
   if (!isOpen) return

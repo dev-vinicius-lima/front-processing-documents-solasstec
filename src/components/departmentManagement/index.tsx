@@ -113,15 +113,15 @@ export default function DepartmentsPage() {
       <Header />
 
       <main className="flex items-center justify-center mx-auto py-10 px-6">
-        <div className="bg-white rounded-lg  p-6 w-[80%] shadow-lg">
+        <div className="bg-white rounded-lg  p-6 w-[80%] max-sm:w-full shadow-lg">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold border-b-2 border-[#4B87E2] pb-1">
+            <h2 className="text-xl max-sm:text-md font-semibold border-b-2 border-[#4B87E2] pb-1">
               Lista de Departamentos
             </h2>
             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
               <DialogTrigger asChild>
-                <Button className="bg-[#4B87E2] hover:bg-[#2C4B9C] w-1/6">
-                  <Plus className="w-4 h-4 mr-2" />
+                <Button className="bg-[#4B87E2] hover:bg-[#2C4B9C] w-1/6 max-sm:w-[40%] max-sm:text-xs max-sm:font-semibold">
+                  <Plus className="w-4 h-4 mr-2 max-sm:hidden" />
                   Criar Departamento
                 </Button>
               </DialogTrigger>

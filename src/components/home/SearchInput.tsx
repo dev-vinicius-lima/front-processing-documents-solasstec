@@ -11,6 +11,7 @@ import { useEffect, useState } from "react"
 import SendDocumentModal from "./SendDocumentModal"
 import ReceiveDocumentModal from "./ReceiveDocumentModal"
 import useDownloadFile from "@/hooks/useDownloadFile"
+import { getLocalDateTime } from "@/utils/getLocalDateTime"
 
 const InputWithIcon = ({
   type,
@@ -85,6 +86,7 @@ const TableWithInputs = ({
 
   const handleReceiveClick = async (document: IDocument) => {
     const currentSector = document.sectorShipping
+
     if (document.isReceived) {
       toast({
         title: "Erro",
@@ -111,16 +113,18 @@ const TableWithInputs = ({
       })
       return
     }
-
+    const updatedDocument = {
+      ...document,
+      isReceived: true,
+      dateTimeReceived: getLocalDateTime(),
+    }
     setDocuments((prevDocuments) =>
       prevDocuments.map((doc) =>
-        doc.id === document.id
-          ? { ...doc, isReceived: true, isSend: false }
-          : doc
+        doc.id === document.id ? updatedDocument : doc
       )
     )
     setIsReceiveModalOpen(true)
-    setSelectedDocument(document)
+    setSelectedDocument(updatedDocument)
   }
 
   const handleDelete = async (documentId: number) => {
@@ -300,6 +304,13 @@ const TableWithInputs = ({
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         document={selectedDocument || ({} as IDocument)}
+        onDocumentSend={(updatedDocument: IDocument) => {
+          setDocuments((prevDocuments) =>
+            prevDocuments.map((doc) =>
+              doc.id === updatedDocument.id ? updatedDocument : doc
+            )
+          )
+        }}
       />
 
       <ReceiveDocumentModal

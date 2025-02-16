@@ -75,14 +75,6 @@ const ReceiveDocumentModal = ({
       })
       return
     }
-    if (documentCreate.isReceived) {
-      toast({
-        title: "Erro",
-        description: "Este documento já foi recebido.",
-        className: "bg-red-500 text-white",
-      })
-      return
-    }
 
     await receiveDocument(Number(documentCreate.id))
 
