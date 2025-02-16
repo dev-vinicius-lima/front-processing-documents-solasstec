@@ -41,7 +41,7 @@ const FormRegisterDocument: React.FC<FormRegisterDocumentProps> = ({
               onChange={handleChange}
               value={formData.departmentId}
             >
-              <option value="">Selecionar um setor</option>
+              <option value="">Selecione seu setor</option>
               {departments.map((department) => (
                 <option
                   className="bg-slate-100 w-full text-blue-800"

@@ -65,6 +65,15 @@ const useFormRegisterDocument = (
       return
     }
 
+    if (!departmentId) {
+      toast({
+        title: "Erro ao enviar formulário",
+        description: "Selecione o seu setor.",
+        className: "bg-red-500 text-white",
+      })
+      return
+    }
+
     const formPayload = new FormData()
     formPayload.append("type", type)
     formPayload.append("title", title)
@@ -97,6 +106,7 @@ const useFormRegisterDocument = (
       toast({
         title: "Sucesso!",
         description: "Documento cadastrado com sucesso.",
+        className: "bg-green-500 text-white",
         duration: 3000,
       })
       onNewDocument(newDocument)

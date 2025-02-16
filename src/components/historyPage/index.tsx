@@ -21,25 +21,7 @@ import {
 import { useEffect, useState } from "react"
 import useDepartments from "@/hooks/useDepartments"
 import useDownloadFile from "@/hooks/useDownloadFile"
-
-interface DocumentMovement {
-  fileName: string
-  id: number
-  type: string
-  title: string
-  description: string
-  file: string
-  createdAt: string
-  isReceived: boolean
-  status: string
-  history: Array<{
-    id: number
-    action: string
-    date: string
-    sendingDepartment: string
-    receivingDepartment: string
-  }>
-}
+import { DocumentMovement } from "@/types/Document"
 
 export default function DocumentMovementHistory() {
   const [documents, setDocuments] = useState<DocumentMovement[]>([])
@@ -228,7 +210,7 @@ export default function DocumentMovementHistory() {
                             variant="outline"
                             size="icon"
                             className="h-8 w-8"
-                            onClick={() => downloadFile(doc.fileName)}
+                            onClick={() => downloadFile(doc.file)}
                           >
                             <Download className="h-4 w-4" />
                             <span className="sr-only">Download</span>
