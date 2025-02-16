@@ -20,7 +20,7 @@ const ButtonRegisterDocuments: React.FC<ButtonRegisterDocumentsProps> = ({
   return (
     <div>
       <Button
-        className="mt-4 bg-cyan-600 w-[15%] h-8 hover:bg-cyan-800"
+        className="mt-4 bg-cyan-600 w-[15%] max-sm:w-[30%] h-8 hover:bg-cyan-800"
         onClick={() => {
           openModal()
         }}

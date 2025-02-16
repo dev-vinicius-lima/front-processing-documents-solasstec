@@ -172,8 +172,8 @@ const TableWithInputs = ({
   if (error) return <div>Error: {error}</div>
 
   return (
-    <div>
-      <table className="min-w-full h-auto mt-4 mb-2 shadow-md border border-slate-200 rounded-lg overflow-hidden text-sm">
+    <div className="max-sm:overflow-x-auto">
+      <table className="min-w-full h-auto mt-4 mb-2 shadow-md border border-slate-200 rounded-lg overflow-hidden text-sm max-sm:text-xs max-sm:text-center max-sm:table-auto max-sm:w-full ">
         <thead className="bg-slate-100">
           <tr>
             {headers.map((header) => (

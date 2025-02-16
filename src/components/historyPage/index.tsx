@@ -80,7 +80,7 @@ export default function DocumentMovementHistory() {
   return (
     <div className="w-full bg-slate-200">
       <div className="py-8 w-full h-[calc(100vh-64px)] flex justify-center items-center">
-        <div className="bg-white h-[95%] rounded-lg shadow-lg w-[80%]">
+        <div className="bg-slate-100 h-[95%] max-sm:h-screen max-sm:mt-[10%] rounded-lg shadow-lg w-[80%] max-sm:w-full">
           <div className="p-6">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-semibold p-3 border-b-2 border-[#4B87E2] pb-1">
@@ -226,6 +226,7 @@ export default function DocumentMovementHistory() {
                   variant="outline"
                   disabled={currentPage === 1}
                   onClick={() => setCurrentPage(currentPage - 1)}
+                  className="bg-blue-400 text-white hover:bg-blue-600"
                 >
                   Anterior
                 </Button>
@@ -233,6 +234,7 @@ export default function DocumentMovementHistory() {
                   variant="outline"
                   disabled={currentPage === totalPages}
                   onClick={() => setCurrentPage(currentPage + 1)}
+                  className="bg-blue-400 text-white hover:bg-blue-600"
                 >
                   Próximo
                 </Button>
