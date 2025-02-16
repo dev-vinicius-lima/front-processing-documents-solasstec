@@ -55,11 +55,6 @@ const SendDocumentModal = ({
       })
       return
     }
-
-    console.log("Payload enviado:", {
-      documentId: documentCreate.id,
-      receivingDepartmentId: Number(receivingSector),
-    })
     try {
       const response = await fetch("http://localhost:3333/documents/send", {
         method: "POST",
@@ -72,13 +67,14 @@ const SendDocumentModal = ({
         }),
       })
 
-      if (!response.ok) {
+      if (!response.ok || response.status === 400) {
         const erroData = await response.json()
         toast({
           title: "Erro",
           description: erroData.message,
           className: "bg-red-500 text-white",
         })
+        return
       }
 
       toast({

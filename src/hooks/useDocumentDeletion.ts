@@ -18,7 +18,7 @@ export function useDocumentDeletion(): UseDocumentDeletion {
       await fetch(`http://localhost:3333/documents/${documentId}`, {
         method: "DELETE",
       })
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      await new Promise((resolve) => setTimeout(resolve, 100))
     } catch (err) {
       console.error("Erro ao deletar documento:", err)
       setError("Não foi possível deletar o documento")

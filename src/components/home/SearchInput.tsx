@@ -7,7 +7,7 @@ import usePagination from "@/hooks/usePagination"
 import useSearch from "@/hooks/useSearch"
 import { useDocumentDeletion } from "@/hooks/useDocumentDeletion"
 import { toast } from "@/hooks/use-toast"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import SendDocumentModal from "./SendDocumentModal"
 import ReceiveDocumentModal from "./ReceiveDocumentModal"
 import useDownloadFile from "@/hooks/useDownloadFile"
@@ -56,10 +56,11 @@ const TableWithInputs = ({
   const { refetch } = useDocuments()
   const { downloadFile } = useDownloadFile()
 
-  // useEffect(() => {
-  //   refetch()
-  // }, [refetch])
-  const handleSendClick = (document: IDocument) => {
+  useEffect(() => {
+    refetch()
+  }, [documents])
+
+  const handleSendClick = async (document: IDocument) => {
     if (document.isSend && !document.isReceived) return
 
     setDocuments((prevDocuments) =>
@@ -72,6 +73,7 @@ const TableWithInputs = ({
 
     setSelectedDocument(document)
     setIsModalOpen(true)
+    await refetch()
   }
 
   const handleReceiveClick = async (document: IDocument) => {
@@ -120,10 +122,9 @@ const TableWithInputs = ({
       setDocuments((prevDocuments) =>
         prevDocuments.filter((doc) => doc.id !== documentId)
       )
-
       await refetch()
 
-      if (filteredData.length === 1 && currentPage > 1) {
+      if (filteredData.length === 0 && currentPage > 1) {
         prevPage()
       }
 

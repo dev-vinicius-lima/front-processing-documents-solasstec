@@ -1,6 +1,6 @@
 "use client"
 import { format } from "date-fns"
-import { Download, FileText, Search } from "lucide-react"
+import { Download, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -88,7 +88,7 @@ export default function DocumentMovementHistory() {
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
               <div className="relative">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
                 <Input
@@ -151,7 +151,7 @@ export default function DocumentMovementHistory() {
                     <TableHead>Setor Recebimento</TableHead>
                     <TableHead>Data Recebimento</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead className="w-[100px]">Ações</TableHead>
+                    <TableHead className="w-[50px]">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -197,15 +197,7 @@ export default function DocumentMovementHistory() {
                         </span>
                       </TableCell>
                       <TableCell>
-                        <div className="flex gap-2">
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            className="h-8 w-8"
-                          >
-                            <FileText className="h-4 w-4" />
-                            <span className="sr-only">View details</span>
-                          </Button>
+                        <div className="flex justify-start items-center">
                           <Button
                             variant="outline"
                             size="icon"

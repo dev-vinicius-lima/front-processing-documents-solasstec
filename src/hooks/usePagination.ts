@@ -13,6 +13,10 @@ const usePagination = (data: IDocument[], itemsPerPage: number) => {
     }
   }
 
+  const emptyPage = () => {
+    setCurrentPage(1)
+  }
+
   const prevPage = () => {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1)
@@ -30,6 +34,7 @@ const usePagination = (data: IDocument[], itemsPerPage: number) => {
     totalPages,
     nextPage,
     prevPage,
+    emptyPage,
   }
 }
 
