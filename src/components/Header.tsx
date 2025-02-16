@@ -38,9 +38,9 @@ const Header = () => {
         </Button>
 
         <div className="text-slate-300 px-11 flex items-center gap-2">
-          <p>João da Silva</p>
+          <p>Vinicius Lima</p>
           <div className="flex items-center justify-center rounded-full bg-teal-600 w-10 h-10">
-            <p>JS</p>
+            <p>VL</p>
           </div>
         </div>
       </div>
