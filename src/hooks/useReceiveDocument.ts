@@ -17,7 +17,11 @@ const useReceiveDocument = () => {
       })
 
       if (!response.ok) {
-        throw new Error("Erro ao receber o documento")
+        toast({
+          title: "Erro",
+          description: "Não foi possível receber o documento.",
+          className: "bg-red-500 text-white",
+        })
       }
       const dataError = await response.json()
 

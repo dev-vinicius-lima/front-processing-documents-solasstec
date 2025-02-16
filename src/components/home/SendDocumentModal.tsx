@@ -83,7 +83,10 @@ const SendDocumentModal = ({
 
       toast({
         title: "Sucesso",
-        description: `Documento enviado para setor ${receivingSector} com sucesso`,
+        description: `Documento enviado para o setor ${
+          departments.find((dept) => dept.id.toString() === receivingSector)
+            ?.acronym
+        } com sucesso.`,
         className: "bg-green-500 text-white",
       })
     } catch (error) {
