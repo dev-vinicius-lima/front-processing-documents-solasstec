@@ -7,9 +7,11 @@ import { Button } from "../ui/button"
 import { toast } from "@/hooks/use-toast"
 import useDocuments from "@/hooks/useDocuments"
 import useDepartments from "@/hooks/useDepartments"
+import { IDocument } from "@/types/Document"
 
 interface FormRegisterDocumentProps {
   onClose: () => void
+  onNewDocument: (newDocument: IDocument) => void
 }
 
 interface FormData {
@@ -23,6 +25,7 @@ interface FormData {
 
 const FormRegisterDocument: React.FC<FormRegisterDocumentProps> = ({
   onClose,
+  onNewDocument,
 }) => {
   const [formData, setFormData] = useState<FormData>({
     type: "",
@@ -45,9 +48,6 @@ const FormRegisterDocument: React.FC<FormRegisterDocumentProps> = ({
   }
 
   useEffect(() => {
-    console.log("departmentId:", formData.departmentId)
-    console.log("Departments:", departments)
-
     const department = departments.find(
       (d) => d.id === Number(formData.departmentId)
     )
@@ -114,11 +114,15 @@ const FormRegisterDocument: React.FC<FormRegisterDocumentProps> = ({
         const errorResponse = await response.json()
         throw new Error(`Erro ao enviar formulário: ${errorResponse.message}`)
       }
+
+      const newDocument = await response.json()
       toast({
         title: "Sucesso!",
         description: "Documento cadastrado com sucesso.",
         duration: 3000,
       })
+      onNewDocument(newDocument)
+
       await refetch()
       if (typeof onClose === "function") {
         onClose()

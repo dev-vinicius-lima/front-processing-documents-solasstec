@@ -37,8 +37,14 @@ const InputWithIcon = ({
   )
 }
 
-const TableWithInputs = () => {
-  const { documents, loading, error, setDocuments } = useDocuments()
+const TableWithInputs = ({
+  documents,
+  setDocuments,
+}: {
+  documents: IDocument[]
+  setDocuments: React.Dispatch<React.SetStateAction<IDocument[]>>
+}) => {
+  const { loading, error } = useDocuments()
   const { currentPage, totalPages, nextPage, prevPage } = usePagination(
     documents,
     5

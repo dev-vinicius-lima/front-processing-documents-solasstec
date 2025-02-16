@@ -3,8 +3,14 @@ import React, { useState } from "react"
 import { Button } from "../ui/button"
 import { Plus, X } from "lucide-react"
 import FormRegisterDocument from "./FormRegisterDocument"
+import { IDocument } from "@/types/Document"
 
-const ButtonRegisterDocuments = () => {
+interface ButtonRegisterDocumentsProps {
+  onNewDocument: (newDocument: IDocument) => void
+}
+const ButtonRegisterDocuments: React.FC<ButtonRegisterDocumentsProps> = ({
+  onNewDocument,
+}) => {
   const [isOpenModal, setIsOpenModal] = useState(false)
 
   const openModal = () => {
@@ -37,7 +43,10 @@ const ButtonRegisterDocuments = () => {
                 </button>
               </div>
             </div>
-            <FormRegisterDocument onClose={() => setIsOpenModal(false)} />
+            <FormRegisterDocument
+              onClose={() => setIsOpenModal(false)}
+              onNewDocument={onNewDocument}
+            />
           </div>
         </div>
       )}
