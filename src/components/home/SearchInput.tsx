@@ -7,10 +7,9 @@ import usePagination from "@/hooks/usePagination"
 import useSearch from "@/hooks/useSearch"
 import { useDocumentDeletion } from "@/hooks/useDocumentDeletion"
 import { toast } from "@/hooks/use-toast"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import SendDocumentModal from "./SendDocumentModal"
 import ReceiveDocumentModal from "./ReceiveDocumentModal"
-import { format } from "date-fns"
 import useDownloadFile from "@/hooks/useDownloadFile"
 
 const InputWithIcon = ({
@@ -57,9 +56,9 @@ const TableWithInputs = ({
   const { refetch } = useDocuments()
   const { downloadFile } = useDownloadFile()
 
-  useEffect(() => {
-    refetch()
-  }, [refetch])
+  // useEffect(() => {
+  //   refetch()
+  // }, [refetch])
   const handleSendClick = (document: IDocument) => {
     if (document.isSend && !document.isReceived) return
 
@@ -161,14 +160,14 @@ const TableWithInputs = ({
   if (error) return <div>Error: {error}</div>
 
   return (
-    <>
-      <table className="min-w-full w-full mt-6 mb-2 shadow-md border border-slate-200 rounded-lg overflow-hidden text-sm">
+    <div>
+      <table className="min-w-full h-auto mt-4 mb-2 shadow-md border border-slate-200 rounded-lg overflow-hidden text-sm">
         <thead className="bg-slate-100">
           <tr>
             {headers.map((header) => (
               <th
                 key={header}
-                className="text-slate-600 border border-slate-200 p-3 text-left"
+                className="text-slate-600 border border-slate-200 p-2 text-left"
               >
                 {header}
               </th>
@@ -194,36 +193,28 @@ const TableWithInputs = ({
         </thead>
         <tbody>
           {!currentDocuments.length && (
-            <td colSpan={10} className="text-center p-4">
-              Nenhum documento encontrado...
-            </td>
+            <tr className="text-center p-4">
+              <td colSpan={8}>Nenhum documento encontrado...</td>
+            </tr>
           )}
           {currentDocuments.map((item: IDocument) => (
-            <tr key={item.id}>
+            <tr key={item.id} className="border border-slate-200">
               <td className="border border-slate-200 p-2">{item.id}</td>
               <td className="border border-slate-200 p-2">{item.title}</td>
               <td className="border border-slate-200 p-2">
                 {item.sectorShipping}
               </td>
               <td className="border border-slate-200 p-2">
-                {item.dateTimeSubmission &&
-                !isNaN(new Date(item.dateTimeSubmission).getTime())
-                  ? format(
-                      new Date(item.dateTimeSubmission),
-                      "dd/MM/yyyy - HH:mm"
-                    )
+                {item.dateTimeSubmission
+                  ? new Date(item.dateTimeSubmission).toLocaleString("pt-BR")
                   : "N/A"}
               </td>
               <td className="border border-slate-200 p-2">
                 {item.ReceivingSector}
               </td>
               <td className="border border-slate-200 p-2">
-                {item.dateTimeReceived &&
-                !isNaN(new Date(item.dateTimeReceived).getTime())
-                  ? format(
-                      new Date(item.dateTimeReceived),
-                      "dd/MM/yyyy - HH:mm"
-                    )
+                {item.dateTimeReceived
+                  ? new Date(item.dateTimeReceived).toLocaleString("pt-BR")
                   : "N/A"}
               </td>
               <td className="border border-slate-200 p-2">
@@ -310,7 +301,7 @@ const TableWithInputs = ({
         setDocuments={setDocuments}
       />
 
-      <div className="flex justify-between mt-4">
+      <div className="flex justify-between my-4">
         <button
           onClick={prevPage}
           disabled={currentPage === 1}
@@ -329,7 +320,7 @@ const TableWithInputs = ({
           Próxima
         </button>
       </div>
-    </>
+    </div>
   )
 }
 

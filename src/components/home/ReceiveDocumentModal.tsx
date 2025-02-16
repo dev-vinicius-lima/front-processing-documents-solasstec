@@ -1,3 +1,4 @@
+"use client"
 import { useEffect, useState } from "react"
 import { Paperclip, X } from "lucide-react"
 import { IDocument } from "@/types/Document"

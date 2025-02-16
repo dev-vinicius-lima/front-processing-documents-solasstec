@@ -1,7 +1,7 @@
-import DocumentManagement from "@/components/home/DocumentManagement"
 import Header from "@/components/Header"
+import DocumentManagement from "@/components/home/DocumentManagement"
 
-export default function Home() {
+function Home() {
   return (
     <div className="bg-slate-200 h-screen flex flex-col">
       <Header />
@@ -11,3 +11,5 @@ export default function Home() {
     </div>
   )
 }
+
+export default Home
